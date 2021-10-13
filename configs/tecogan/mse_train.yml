@@ -1,0 +1,90 @@
+#### general settings
+name: mse_model
+model: vsrnet
+scale: 4
+type: mse
+
+#### datasets
+datasets:
+  train:
+    name: train
+    mode: LQGT
+    noise_needed: false
+    dataroot_GT: ["../datasets/test/HR/"]
+    dataroot_LQ: ["../datasets/test/LRx2-compressed/"]
+    use_shuffle: true
+    n_workers: 4  # per GPU
+    batch_size: 8
+    GT_size: 128
+    sequence_length: 10
+  val:
+    name: validation
+    mode: LQGT
+    noise_needed: false
+    noise_data: ~
+    dataroot_GT: ["../datasets/test/HR/"]
+    dataroot_LQ: ["../datasets/test/LRx2-compressed/"]
+    use_shuffle: false
+    n_workers: 4  # per GPU
+    batch_size: 1
+    GT_size: 128
+    sequence_length: 10
+
+#### network structures
+structure:
+  network_G:
+    which_model_G: frvsrnet_pixel
+    in_nc: 3
+    out_nc: 3
+    nf: 64
+    num_modules: 16
+  network_D:
+    which_model_D: spatio_temporal_critic
+    in_nc: 3
+    spatial_size: 128
+    tempo_range: 3
+    
+#### path
+pretraining_settings:
+  network_G: 
+    fnet_model_path: ./fnet.pth
+    want_load: false
+    type: psnr # psnr | gan
+    pretrained_model_path: ./pretrained_model/FRVSR_PSNR_x4.pth
+    strict_load: false
+    key: ~
+  network_D: 
+    want_load: false
+    pretrained_model_path: ../pretrained_model/RRDB_PSNR_x4.pth
+    strict_load: true
+    key: ~
+  
+#epoch settings
+epoch_settings:
+  total_epochs: 100
+  resume_state_epoch: ~
+  resume_state_batch: ~
+
+#### training settings: learning rate scheme, loss
+train_settings:
+  lr_G: !!float 1e-4
+  weight_decay_G: !!float 1e-3
+  beta1_G: 0.9
+  beta2_G: 0.999
+  lr_D: !!float 1e-4
+  weight_decay_D: !!float 1e-3
+  beta1_D: 0.9
+  beta2_D: 0.999
+  trainer_type: psnr  # gan | psnr
+  pixel_criterion: l1 #l1 | l2
+  pixel_weight: !!float 1e-2  # 1 if train type is psnr
+  feature_criterion: l1
+  feature_loss_type: WassFeatureLoss  ## WassFeatureLoss | FeatureLoss
+  gan_weight: !!float 5e-3
+  top_score:  !!int -1
+  save_checkpoint_folder_path: "../checkpoints"
+  save_checkpoint_file_name: "small_checkpoint"
+  save_bestmodel_file_name: "small_best"
+
+  load_checkpoint_file_path: ~
+  sample_interval: 100

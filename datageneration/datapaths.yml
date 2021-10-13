@@ -1,0 +1,24 @@
+datasets:
+  crowd  : "../../video-datasets/Crowd"
+  drone  : "../../video-datasets/Drone"
+  sports : "../../video-datasets/Sports"
+  vimeo : "../../video-datasets/vimeo/sequences"
+
+generate_configs:
+  compress: true
+  need_blur: false
+  save_hr: true
+  generate_lr: true
+  video_frame_limit: 100
+  ignore_video: false
+  ignore_directory: false
+  ignore_if_exists: false
+  upscale_factor: 1
+  cleanup_factor: 0.5
+  dataset : sports 
+  execute_parellel: true
+  process_video_with_ffmpeg: false
+
+
+
+
